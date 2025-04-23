@@ -416,6 +416,15 @@ body {
     30% { transform: translateY(-5px); }
 }
 
+.ai-chat-footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.75rem;
+    color: var(--gray);
+    border-top: 1px solid var(--light-gray);
+    background-color: var(--light);
+}
+
 /* Plan styling */
 .plan-container {
     background-color: rgba(245, 196, 94, 0.1);
