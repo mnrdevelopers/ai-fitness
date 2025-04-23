@@ -110,32 +110,273 @@ function initAuthStateListener() {
     });
 }
 
- // Replace the old generateWorkoutPlan function with this new one
- // Enhanced generateWorkoutPlan function
-async function generateWorkoutPlan(userData) {
-    try {
-        const API_KEY = "AIzaSyCGYLk04ZAIWfM7xgxbIArK6n2aRvl7Gyk";
+// AI Chat functionality
+let chatHistory = [];
+let currentTab = 'workout';
+
+function initAIChat() {
+    const chatModal = document.getElementById('aiChatModal');
+    const chatButton = document.getElementById('aiChatButton');
+    const closeButton = document.getElementById('closeChat');
+    const sendButton = document.getElementById('sendChatMessage');
+    const chatInput = document.getElementById('aiChatInput');
+    const chatMessages = document.getElementById('aiChatMessages');
+    const quickQuestions = document.querySelectorAll('.quick-question');
+    const tabs = document.querySelectorAll('.ai-tab');
+
+    // Toggle chat modal
+    chatButton.addEventListener('click', () => {
+        chatModal.classList.toggle('active');
+        if (chatModal.classList.contains('active')) {
+            chatInput.focus();
+        }
+    });
+
+    // Close chat
+    closeButton.addEventListener('click', () => {
+        chatModal.classList.remove('active');
+    });
+
+    // Tab switching
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentTab = tab.dataset.tab;
+            
+            // Update placeholder based on tab
+            chatInput.placeholder = currentTab === 'workout' 
+                ? 'Ask me anything about workouts...' 
+                : 'Ask me anything about nutrition...';
+        });
+    });
+
+    // Send message on button click
+    sendButton.addEventListener('click', sendMessage);
+
+    // Send message on Enter key
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Quick question buttons
+    quickQuestions.forEach(button => {
+        button.addEventListener('click', () => {
+            const question = button.dataset.question;
+            addUserMessage(question);
+            processUserMessage(question);
+        });
+    });
+
+    function sendMessage() {
+        const message = chatInput.value.trim();
+        if (message) {
+            addUserMessage(message);
+            processUserMessage(message);
+            chatInput.value = '';
+        }
+    }
+
+    function addUserMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'ai-message ai-user-message';
+        messageElement.innerHTML = `
+            <div class="message-content">${message}</div>
+        `;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addBotMessage(message, isTyping = false) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'ai-message ai-bot-message';
         
-        const prompt = `Act as FitGenius, an expert personal trainer. Create a detailed ${userData.daysPerWeek}-day workout plan for a ${userData.level} client with these parameters:
-- Primary Goal: ${userData.goal}
-- Focus Area: ${userData.focusArea}
-- Equipment: ${userData.equipment}
-- Session Duration: ${userData.duration} minutes
-- Limitations: ${userData.injuries || 'none'}
+        if (isTyping) {
+            messageElement.innerHTML = `
+                <div class="message-content">
+                    <span>${message}</span>
+                    <div class="ai-typing">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+        } else {
+            messageElement.innerHTML = `
+                <div class="message-content">${message}</div>
+            `;
+        }
+        
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return messageElement;
+    }
 
-Structure the plan with:
-1. A brief introduction with general advice
-2. For each day:
-   - Day title (e.g., "Day 1: Upper Body Focus")
-   - Warm-up routine (5-10 minutes)
-   - Main exercises (3-5 exercises with sets, reps, rest periods)
-   - Cool-down/stretching (5 minutes)
-3. Include form tips for each exercise
-4. Add progression recommendations
+    async function processUserMessage(message) {
+        // Add to chat history
+        chatHistory.push({ role: 'user', content: message });
+        
+        // Show typing indicator
+        const botMessageElement = addBotMessage(currentTab === 'workout' 
+            ? 'Creating your workout plan...' 
+            : 'Creating your diet plan...', true);
+        
+        try {
+            // Get response from Gemini AI
+            const response = await generateAIResponse(message, currentTab);
+            
+            // Remove typing indicator and show actual response
+            botMessageElement.innerHTML = `
+                <div class="message-content">${formatAIResponse(response, currentTab)}</div>
+            `;
+            
+            // Add to chat history
+            chatHistory.push({ role: 'assistant', content: response });
+            
+        } catch (error) {
+            console.error('AI Error:', error);
+            botMessageElement.innerHTML = `
+                <div class="message-content">
+                    Sorry, I'm having trouble connecting to the AI service. Please try again later.
+                </div>
+            `;
+        }
+    }
 
-Format the response clearly with day sections and bullet points. Use simple, motivational language.`;
+    function formatAIResponse(response, type) {
+        // Format workout plans
+        if (type === 'workout' && (response.includes('Day') || response.includes('Exercise'))) {
+            return formatWorkoutPlan(response);
+        }
+        
+        // Format diet plans
+        if (type === 'diet' && (response.includes('Meal') || response.includes('Breakfast'))) {
+            return formatDietPlan(response);
+        }
+        
+        // Default formatting
+        return response.replace(/\n/g, '<br>');
+    }
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
+    function formatWorkoutPlan(planText) {
+        // Basic formatting for workout plans
+        const formattedPlan = planText
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>')
+            .replace(/Day (\d+):/g, '<div class="plan-day"><div class="plan-day-title">Day $1</div>')
+            .replace(/- (.*?)(<br>|$)/g, '<li>$1</li>');
+        
+        return `
+            <div class="plan-container workout-plan">
+                ${formattedPlan}
+            </div>
+            <div class="plan-actions">
+                <button class="btn btn-primary save-plan">
+                    <i class="far fa-calendar-plus"></i> Save Workout
+                </button>
+                <button class="btn btn-outline share-plan">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
+        `;
+    }
+
+    function formatDietPlan(planText) {
+        // Basic formatting for diet plans
+        const formattedPlan = planText
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>')
+            .replace(/(Breakfast|Lunch|Dinner|Snack):/g, '<div class="meal-item"><div class="meal-time">$1</div><div class="meal-content">')
+            .replace(/(Calories|Protein|Carbs|Fat): (\d+g?)/g, '<span class="nutrition-fact"><strong>$1:</strong> $2</span>');
+        
+        return `
+            <div class="plan-container meal-plan">
+                ${formattedPlan}
+            </div>
+            <div class="plan-actions">
+                <button class="btn btn-primary save-plan">
+                    <i class="far fa-calendar-plus"></i> Save Meal Plan
+                </button>
+                <button class="btn btn-outline share-plan">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
+        `;
+    }
+
+    // Handle save and share buttons dynamically
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('save-plan') || e.target.closest('.save-plan')) {
+            const planText = e.target.closest('.message-content').textContent;
+            addToCalendar({
+                title: currentTab === 'workout' ? 'AI Workout Plan' : 'AI Diet Plan',
+                description: planText.replace(/<[^>]*>/g, ''),
+                start: new Date(),
+                end: new Date(Date.now() + 3600000)
+            });
+            showPopup('Plan saved to your calendar!', 'success');
+        }
+        
+        if (e.target.classList.contains('share-plan') || e.target.closest('.share-plan')) {
+            const planText = e.target.closest('.message-content').textContent;
+            sharePlan(planText.replace(/<[^>]*>/g, ''));
+        }
+    });
+
+    function addToCalendar(event) {
+        // This is a basic implementation - you might want to use a proper calendar API
+        console.log('Adding to calendar:', event);
+        // In a real app, you would integrate with Google Calendar or similar
+    }
+
+    function sharePlan(planText) {
+        if (navigator.share) {
+            navigator.share({
+                title: 'My Fitness Plan',
+                text: planText,
+                url: window.location.href
+            }).catch(err => {
+                console.log('Error sharing:', err);
+                showPopup('Sharing failed. Please try again.', 'error');
+            });
+        } else {
+            // Fallback for browsers that don't support Web Share API
+            const textArea = document.createElement('textarea');
+            textArea.value = planText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showPopup('Plan copied to clipboard!', 'success');
+        }
+    }
+}
+
+// AI response generation using Gemini
+async function generateAIResponse(prompt, type) {
+    try {
+        const API_KEY = "AIzaSyCGYLk04ZAIWfM7xgxbIArK6n2aRvl7Gyk"; // Replace with your actual API key
+        
+        // Create different prompts based on the type (workout or diet)
+        let systemPrompt;
+        if (type === 'workout') {
+            systemPrompt = `You are an expert fitness trainer. The user asked: "${prompt}". 
+            Provide a detailed, professional workout plan with exercises, sets, reps, and rest periods.
+            Structure it clearly with days if it's a multi-day plan.
+            Include warm-up and cool-down recommendations when appropriate.
+            Use simple language and be encouraging.`;
+        } else {
+            systemPrompt = `You are an expert nutritionist. The user asked: "${prompt}". 
+            Provide a detailed, professional meal plan with breakfast, lunch, dinner, and snacks.
+            Include portion sizes and nutritional information (calories, protein, carbs, fat).
+            Consider dietary restrictions if mentioned.
+            Use simple language and be encouraging.`;
+        }
+        
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -143,7 +384,7 @@ Format the response clearly with day sections and bullet points. Use simple, mot
             body: JSON.stringify({
                 contents: [{
                     parts: [{
-                        text: prompt
+                        text: systemPrompt
                     }]
                 }]
             })
@@ -155,149 +396,13 @@ Format the response clearly with day sections and bullet points. Use simple, mot
             return data.candidates[0].content.parts[0].text;
         } else {
             console.error("Unexpected Gemini API response:", data);
-            return "FitGenius is having trouble generating your plan right now. Please try again later.";
+            return "I couldn't generate a response right now. Please try asking again or rephrase your question.";
         }
     } catch (error) {
         console.error("AI Error:", error);
-        return "FitGenius is currently unavailable. Please check your internet connection and try again.";
+        return "I'm having trouble connecting to the AI service. Please try again later.";
     }
 }
-
-// Update the event listener for generating plans
-document.getElementById('generatePlan')?.addEventListener('click', async function () {
-    const goal = document.getElementById('goal').value;
-    const level = document.getElementById('level').value;
-    const focusArea = document.getElementById('focusArea').value;
-    const equipment = document.getElementById('equipment').value;
-    const duration = document.getElementById('duration').value;
-    const daysPerWeek = document.getElementById('daysPerWeek').value;
-    const injuries = document.getElementById('injuries').value;
-
-    if (!goal || !level) {
-        showPopup('Please select at least your goal and fitness level', 'warning');
-        return;
-    }
-
-    const generateBtn = document.getElementById('generatePlan');
-    const generateText = document.getElementById('generateText');
-    const generateSpinner = document.getElementById('generateSpinner');
-    const resultDiv = document.getElementById('aiPlanResult');
-
-    generateBtn.disabled = true;
-    generateText.style.display = 'none';
-    generateSpinner.style.display = 'inline-block';
-    resultDiv.innerHTML = '';
-    resultDiv.style.display = 'none';
-
-    try {
-        const userData = { 
-            goal, 
-            level, 
-            equipment, 
-            focusArea,
-            duration,
-            daysPerWeek,
-            injuries
-        };
-        
-        const plan = await generateWorkoutPlan(userData);
-        
-        // Format the plan with better HTML structure
-        const formattedPlan = formatPlanForDisplay(plan, userData);
-        
-        resultDiv.innerHTML = formattedPlan;
-        resultDiv.style.display = 'block';
-        
-        // Scroll to the result
-        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-        // Add event listeners to action buttons
-        document.querySelector('.send-whatsapp')?.addEventListener('click', () => {
-            const number = prompt("Enter WhatsApp number with country code (e.g. +91...):");
-            if (!number) return;
-            
-            const message = `Your FitGenius Workout Plan:\n\nGoal: ${goal}\nLevel: ${level}\nFocus: ${focusArea}\nEquipment: ${equipment}\n\n---\n${plan}`;
-            const waUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
-        });
-        
-        document.querySelector('.save-plan')?.addEventListener('click', async () => {
-            const user = firebase.auth().currentUser;
-            if (!user) return showPopup('Sign in required to save the plan.', 'warning');
-        
-            const planData = {
-                userId: user.uid,
-                goal,
-                level,
-                focusArea,
-                equipment,
-                plan,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-        
-            try {
-                await firebase.firestore().collection('userPlans').add(planData);
-                showPopup('Plan saved to your account!', 'success');
-            } catch (err) {
-                console.error('Save to Firestore failed:', err);
-                showPopup('Failed to save plan. Please try again.', 'error');
-            }
-        });
-        
-
-    } catch (error) {
-        console.error('Plan generation error:', error);
-        resultDiv.innerHTML = `
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>FitGenius couldn't generate your plan. Please try again later.</p>
-            </div>
-        `;
-        resultDiv.style.display = 'block';
-    } finally {
-        generateBtn.disabled = false;
-        generateText.style.display = 'inline-block';
-        generateSpinner.style.display = 'none';
-    }
-});
-
-// Helper function to format the AI response
-function formatPlanForDisplay(planText, userData) {
-    // Basic formatting - in a real app you'd parse the response more carefully
-    const formattedText = planText
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-        .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic text
-        .replace(/\n/g, '<br>'); // Line breaks
-    
-    return `
-        <div class="plan-header">
-            <div class="plan-title">Your FitGenius ${userData.goal} Plan</div>
-            <div class="plan-meta">${userData.level} level | ${userData.daysPerWeek} days/week</div>
-        </div>
-        <div class="plan-content">${formattedText}</div>
-        <div class="plan-actions">
-            <button class="btn btn-outline send-whatsapp">
-                <i class="fab fa-whatsapp"></i> Share
-            </button>
-            <button class="btn btn-primary save-plan">
-                <i class="fas fa-save"></i> Save Plan
-            </button>
-        </div>
-    `;
-}
-
-// Quick suggestion buttons
-document.querySelectorAll('.suggestion-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const goal = this.dataset.goal;
-        const level = this.dataset.level;
-        
-        document.getElementById('goal').value = goal;
-        document.getElementById('level').value = level;
-        
-        showPopup(`Prefilled for ${level} ${goal} plan`, 'success');
-    });
-});
 
 // Testimonials Slider
 function initTestimonialsSlider() {
@@ -525,6 +630,7 @@ function initApp() {
     initTestimonialsSlider();
     handleContactForm();
     initWhatsAppBooking();
+    initAIChat();
     
     // Add floating labels functionality
     const formInputs = document.querySelectorAll('.form-control');
@@ -535,87 +641,8 @@ function initApp() {
     });
 }
 
-document.getElementById('fabAiPlanner')?.addEventListener('click', () => {
-    document.getElementById('aiPlannerPopup').style.display = 'flex';
-  });
-  
-  
-  document.getElementById('closeChat')?.addEventListener('click', () => {
-    document.getElementById('aiPlannerPopup').style.display = 'none';
-  });
-  
 // Start the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', initApp);
-
-// Update the event listener for generating plans
-document.getElementById('generatePlan')?.addEventListener('click', async function () {
-    const goal = document.getElementById('goal').value;
-    const level = document.getElementById('level').value;
-    const focusArea = document.getElementById('focusArea').value;
-    const equipment = document.getElementById('equipment').value;
-  
-    if (!goal || !level) {
-      showPopup('Please select both goal and level', 'warning');
-      return;
-    }
-  
-    const generateBtn = document.getElementById('generatePlan');
-    const generateText = document.getElementById('generateText');
-    const generateSpinner = document.getElementById('generateSpinner');
-    const resultDiv = document.getElementById('aiPlanResult');
-  
-    generateBtn.disabled = true;
-    generateText.style.display = 'none';
-    generateSpinner.style.display = 'inline-block';
-    resultDiv.innerHTML = '';
-    resultDiv.style.display = 'block';
-  
-    try {
-      const userData = { goal, level, equipment, focusArea };
-      const plan = await generateWorkoutPlan(userData);
-      const summaryText = `Goal: ${goal}\nLevel: ${level}\nFocus: ${focusArea}\nEquipment: ${equipment}`;
-      const cleanPlan = plan.replace(/<[^>]+>/g, '');
-  
-      resultDiv.innerHTML = `
-  <h4>Your Personalized ${goal} Plan (${level} level)</h4>
-  <pre class="plan-content" style="white-space: pre-wrap;">${plan}</pre>
-  <button class="btn btn-outline send-whatsapp">
-    <i class="fab fa-whatsapp"></i> Send to WhatsApp
-  </button>
-`;
-
-  
-      document.querySelector('.view-details')?.addEventListener('click', function () {
-        const content = document.querySelector('.plan-content');
-        const visible = content.style.display === 'block';
-        content.style.display = visible ? 'none' : 'block';
-        this.textContent = visible ? 'View Full Plan' : 'Hide Full Plan';
-      });
-  
-      document.querySelector('.send-whatsapp')?.addEventListener('click', () => {
-        const number = prompt("Enter WhatsApp number with country code (e.g. +91...):");
-        if (!number) return;
-  
-        const message = `Your AI Workout Plan:\n\n${summaryText}\n\n---\nFull Plan:\n${cleanPlan}`;
-        const waUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-        window.open(waUrl, '_blank');
-      });
-  
-    } catch (error) {
-      console.error('Plan generation error:', error);
-      resultDiv.innerHTML = `
-        <div class="error-message">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Failed to generate plan. Please try again later.</p>
-        </div>
-      `;
-    } finally {
-      generateBtn.disabled = false;
-      generateText.style.display = 'inline-block';
-      generateSpinner.style.display = 'none';
-    }
-  });
-  
 
 // WhatsApp Booking with Loading & Alerts
 function initWhatsAppBooking() {
