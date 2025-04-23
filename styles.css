@@ -252,6 +252,27 @@ body {
     color: var(--dark);
 }
 
+.ai-chat-messages .contact-info {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(245, 196, 94, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid var(--primary);
+}
+
+.ai-chat-messages .contact-info div {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-chat-messages .contact-info i {
+    width: 20px;
+    text-align: center;
+    color: var(--primary);
+}
+
 .ai-chat-messages {
     flex: 1;
     padding: 15px;
