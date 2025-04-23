@@ -686,7 +686,7 @@ body {
   }
   
   
-/* FitGenius AI Trainer - Fixed Styles */
+ /* FitGenius AI Trainer - Fixed Styles */
 .chat-popup {
     width: 380px;
     max-height: 80vh;
@@ -2060,4 +2060,99 @@ body {
         padding: 10px 20px;
         font-size: 0.9rem;
     }
+}
+
+
+/* Improved AI Trainer Popup Styles */
+#aiPlannerPopup {
+    background: #fff;
+    border-radius: 12px;
+    width: 360px;
+    max-height: 90vh;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    border: 2px solid var(--primary);
+}
+
+#aiPlannerPopup .chat-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--dark);
+    padding: 15px 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#aiPlannerPopup .chat-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+#aiPlannerPopup .form-section {
+    margin-bottom: 20px;
+}
+
+#aiPlannerPopup label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray);
+    margin-bottom: 6px;
+    display: block;
+}
+
+#aiPlannerPopup input,
+#aiPlannerPopup select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--light-gray);
+    margin-bottom: 15px;
+}
+
+#aiPlannerPopup .generate-btn {
+    width: 100%;
+    background-color: var(--primary);
+    color: var(--dark);
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#aiPlannerPopup .generate-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+#aiPlannerPopup .suggestion-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#aiPlannerPopup .suggestion-btn {
+    background-color: rgba(245, 196, 94, 0.1);
+    border: 1px solid var(--primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--dark);
+    transition: background 0.3s ease;
+}
+
+#aiPlannerPopup .suggestion-btn:hover {
+    background-color: var(--primary);
+    color: var(--dark);
 }
