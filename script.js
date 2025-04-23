@@ -242,8 +242,44 @@ function initAIChat() {
         return messageElement;
     }
 
+  function isCreatorQuestion(message) {
+    const creatorKeywords = [
+        'who created you',
+        'who made you',
+        'who developed you',
+        'who invented you',
+        'who built you',
+        'who designed you',
+        'your creator',
+        'your developer',
+        'your inventor'
+    ];
+    
+    const lowerMessage = message.toLowerCase();
+    return creatorKeywords.some(keyword => lowerMessage.includes(keyword));
+}
+
     async function processUserMessage(message) {
-        // Add to chat history
+            // Check if this is a "who created you" question
+    if (isCreatorQuestion(message)) {
+        const creatorResponse = `
+            I was created by MNR Developers, the developer behind this fitness platform. 
+            He built me to help users with their fitness and nutrition questions.
+            
+            You can contact him at:
+            Email: mnrdeveloper11@gmail.com
+            WhatsApp: +91 74160 06394
+        `;
+        
+        // Remove typing indicator and show actual response
+        const botMessageElement = document.querySelector('.ai-bot-message:last-child');
+        if (botMessageElement) {
+            botMessageElement.innerHTML = `
+                <div class="message-content">${creatorResponse}</div>
+            `;
+        }
+      
+      // Add to chat history
         chatHistory.push({ role: 'user', content: message });
         
         // Show typing indicator
