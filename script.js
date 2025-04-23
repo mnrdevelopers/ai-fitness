@@ -253,7 +253,7 @@ function initAIChat() {
         return messageElement;
     }
 
-    async function processUserMessage(message) {
+   async function processUserMessage(message) {
     // Check if this is a "who created you" question
     if (isCreatorQuestion(message)) {
         const creatorResponse = `
@@ -267,44 +267,40 @@ function initAIChat() {
                 <div><i class="fab fa-whatsapp"></i> +91 81216 81711</div>
             </div>
         `;
-        
-        const botMessageElement = document.querySelector('.ai-bot-message:last-child');
-        if (botMessageElement) {
-            botMessageElement.innerHTML = `
-                <div class="message-content">${creatorResponse}</div>
-            `;
-        }
-        
+
+        // Add the creator response using the standard bot message function
+        addBotMessage(creatorResponse);
         chatHistory.push({ role: 'assistant', content: creatorResponse });
         return;
     }
-    
-        // Show typing indicator
-        const botMessageElement = addBotMessage(currentTab === 'workout' 
-            ? 'Creating your workout plan...' 
-            : 'Creating your diet plan...', true);
-        
-        try {
-            // Get response from Gemini AI
-            const response = await generateAIResponse(message, currentTab);
-            
-            // Remove typing indicator and show actual response
-            botMessageElement.innerHTML = `
-                <div class="message-content">${formatAIResponse(response, currentTab)}</div>
-            `;
-            
-            // Add to chat history
-            chatHistory.push({ role: 'assistant', content: response });
-            
-        } catch (error) {
-            console.error('AI Error:', error);
-            botMessageElement.innerHTML = `
-                <div class="message-content">
-                    Sorry, I'm having trouble connecting to the AI service. Please try again later.
-                </div>
-            `;
-        }
+
+    // Show typing indicator
+    const botMessageElement = addBotMessage(currentTab === 'workout' 
+        ? 'Creating your workout plan...' 
+        : 'Creating your diet plan...', true);
+
+    try {
+        // Get response from Gemini AI
+        const response = await generateAIResponse(message, currentTab);
+
+        // Remove typing indicator and show actual response
+        botMessageElement.innerHTML = `
+            <div class="message-content">${formatAIResponse(response, currentTab)}</div>
+        `;
+
+        // Add to chat history
+        chatHistory.push({ role: 'assistant', content: response });
+
+    } catch (error) {
+        console.error('AI Error:', error);
+        botMessageElement.innerHTML = `
+            <div class="message-content">
+                Sorry, I'm having trouble connecting to the AI service. Please try again later.
+            </div>
+        `;
     }
+}
+
 
     function formatAIResponse(response, type) {
         // Format workout plans
