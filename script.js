@@ -124,10 +124,37 @@ function initAIChat() {
     const quickQuestions = document.querySelectorAll('.quick-question');
     const tabs = document.querySelectorAll('.ai-tab');
 
-    // Toggle chat modal
+   // Toggle chat modal - update this part
     chatButton.addEventListener('click', () => {
-        chatModal.classList.toggle('active');
+        const user = auth.currentUser;
+        if (!user) {
+            showPopup('Please sign in to access the AI Trainer', 'warning');
+            return;
+        }
+
+            chatModal.classList.toggle('active');
         if (chatModal.classList.contains('active')) {
+            // Personalized greeting
+            const userName = user.displayName || 'Fitness Enthusiast';
+            const welcomeMessage = `Welcome back, ${userName}! I'm FitBot, your AI fitness assistant. How can I help you today?`;
+            
+            // Clear previous messages
+            chatMessages.innerHTML = '';
+            
+            // Add welcome message with animation
+            setTimeout(() => {
+                const welcomeElement = document.createElement('div');
+                welcomeElement.className = 'ai-message ai-bot-message';
+                welcomeElement.innerHTML = `
+                    <div class="message-content">${welcomeMessage}</div>
+                `;
+                chatMessages.appendChild(welcomeElement);
+                
+                // Bounce animation
+                welcomeElement.style.animation = 'bounceIn 0.6s ease';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 300);
+            
             chatInput.focus();
         }
     });
