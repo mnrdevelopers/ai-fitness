@@ -261,7 +261,6 @@ body {
 
 .ai-message {
     animation: messageSlideIn 0.3s ease forwards;
-    opacity: 0;
     margin-bottom: 15px;
     display: flex;
 }
