@@ -282,7 +282,7 @@ body {
 }
 
 .message-content {
-    max-width: 80%;
+    max-width: 100%;
     padding: 10px 15px;
     border-radius: 18px;
     line-height: 1.4;
