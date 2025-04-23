@@ -167,6 +167,13 @@ body {
 }
 
 /* AI Chat Styles */
+.ai-chat-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0 auto;
+    color: var(--dark);
+}
+
 .ai-chat-item {
     margin-left: 15px;
 }
@@ -203,6 +210,7 @@ body {
 }
 
 .ai-chat-header {
+    position: relative;
     padding: 10px 15px;
     background-color: var(--primary);
     color: var(--dark);
@@ -252,8 +260,18 @@ body {
 }
 
 .ai-message {
+    animation: messageSlideIn 0.3s ease forwards;
+    opacity: 0;
     margin-bottom: 15px;
     display: flex;
+}
+
+.ai-bot-message .message-content {
+    animation-delay: 0.1s;
+}
+
+.ai-user-message .message-content {
+    animation-delay: 0.2s;
 }
 
 .ai-bot-message {
@@ -336,12 +354,41 @@ body {
     color: var(--dark);
     border: none;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease, transform 0.2s ease;
 }
 
-#sendChatMessage:hover {
-    background-color: var(--primary-dark);
-    transform: scale(1.05);
+#sendChatMessage:active {
+    transform: scale(0.95);
+}
+
+#sendChatMessage:hover i {
+    animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+// Add this new animation to your styles.css
+@keyframes bounceIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.05); }
+    80% { transform: scale(0.95); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+// Add typing indicator animation
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+}
+
+// Add message slide-in animation
+@keyframes messageSlideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 /* Loading indicator for AI responses */
