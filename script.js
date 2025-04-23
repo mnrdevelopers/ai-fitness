@@ -206,6 +206,17 @@ function initAIChat() {
         }
     }
 
+  function isCreatorQuestion(message) {
+    const creatorKeywords = [
+        'who created you', 'who made you', 'who developed you',
+        'who invented you', 'who built you', 'who designed you',
+        'your creator', 'your developer', 'your inventor'
+    ];
+    
+    const lowerMessage = message.toLowerCase();
+    return creatorKeywords.some(keyword => lowerMessage.includes(keyword));
+}
+
     function addUserMessage(message) {
         const messageElement = document.createElement('div');
         messageElement.className = 'ai-message ai-user-message';
@@ -243,9 +254,31 @@ function initAIChat() {
     }
 
     async function processUserMessage(message) {
-        // Add to chat history
-        chatHistory.push({ role: 'user', content: message });
+    // Check if this is a "who created you" question
+    if (isCreatorQuestion(message)) {
+        const creatorResponse = `
+            I was developed by <strong>MNR Developers</strong> (Maniteja), who created this fitness platform and AI trainer. 
+            The fitness programs and training content are provided by <strong>Rajashekar</strong>, our professional fitness trainer.
+            
+            <div class="contact-info">
+                <div><i class="fas fa-user-tie"></i> <strong>Technical Support:</strong> MNR Developers</div>
+                <div><i class="fas fa-dumbbell"></i> <strong>Fitness Trainer:</strong> Rajashekar</div>
+                <div><i class="fas fa-envelope"></i> itsrajashekar12@gmail.com</div>
+                <div><i class="fab fa-whatsapp"></i> +91 81216 81711</div>
+            </div>
+        `;
         
+        const botMessageElement = document.querySelector('.ai-bot-message:last-child');
+        if (botMessageElement) {
+            botMessageElement.innerHTML = `
+                <div class="message-content">${creatorResponse}</div>
+            `;
+        }
+        
+        chatHistory.push({ role: 'assistant', content: creatorResponse });
+        return;
+    }
+    
         // Show typing indicator
         const botMessageElement = addBotMessage(currentTab === 'workout' 
             ? 'Creating your workout plan...' 
