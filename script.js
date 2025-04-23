@@ -110,6 +110,300 @@ function initAuthStateListener() {
     });
 }
 
+// AI Chat functionality
+let chatHistory = [];
+let currentTab = 'workout';
+
+function initAIChat() {
+    const chatModal = document.getElementById('aiChatModal');
+    const chatButton = document.getElementById('aiChatButton');
+    const closeButton = document.getElementById('closeChat');
+    const sendButton = document.getElementById('sendChatMessage');
+    const chatInput = document.getElementById('aiChatInput');
+    const chatMessages = document.getElementById('aiChatMessages');
+    const quickQuestions = document.querySelectorAll('.quick-question');
+    const tabs = document.querySelectorAll('.ai-tab');
+
+    // Toggle chat modal
+    chatButton.addEventListener('click', () => {
+        chatModal.classList.toggle('active');
+        if (chatModal.classList.contains('active')) {
+            chatInput.focus();
+        }
+    });
+
+    // Close chat
+    closeButton.addEventListener('click', () => {
+        chatModal.classList.remove('active');
+    });
+
+    // Tab switching
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentTab = tab.dataset.tab;
+            
+            // Update placeholder based on tab
+            chatInput.placeholder = currentTab === 'workout' 
+                ? 'Ask me anything about workouts...' 
+                : 'Ask me anything about nutrition...';
+        });
+    });
+
+    // Send message on button click
+    sendButton.addEventListener('click', sendMessage);
+
+    // Send message on Enter key
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Quick question buttons
+    quickQuestions.forEach(button => {
+        button.addEventListener('click', () => {
+            const question = button.dataset.question;
+            addUserMessage(question);
+            processUserMessage(question);
+        });
+    });
+
+    function sendMessage() {
+        const message = chatInput.value.trim();
+        if (message) {
+            addUserMessage(message);
+            processUserMessage(message);
+            chatInput.value = '';
+        }
+    }
+
+    function addUserMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'ai-message ai-user-message';
+        messageElement.innerHTML = `
+            <div class="message-content">${message}</div>
+        `;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addBotMessage(message, isTyping = false) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'ai-message ai-bot-message';
+        
+        if (isTyping) {
+            messageElement.innerHTML = `
+                <div class="message-content">
+                    <span>${message}</span>
+                    <div class="ai-typing">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+        } else {
+            messageElement.innerHTML = `
+                <div class="message-content">${message}</div>
+            `;
+        }
+        
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return messageElement;
+    }
+
+    async function processUserMessage(message) {
+        // Add to chat history
+        chatHistory.push({ role: 'user', content: message });
+        
+        // Show typing indicator
+        const botMessageElement = addBotMessage(currentTab === 'workout' 
+            ? 'Creating your workout plan...' 
+            : 'Creating your diet plan...', true);
+        
+        try {
+            // Get response from Gemini AI
+            const response = await generateAIResponse(message, currentTab);
+            
+            // Remove typing indicator and show actual response
+            botMessageElement.innerHTML = `
+                <div class="message-content">${formatAIResponse(response, currentTab)}</div>
+            `;
+            
+            // Add to chat history
+            chatHistory.push({ role: 'assistant', content: response });
+            
+        } catch (error) {
+            console.error('AI Error:', error);
+            botMessageElement.innerHTML = `
+                <div class="message-content">
+                    Sorry, I'm having trouble connecting to the AI service. Please try again later.
+                </div>
+            `;
+        }
+    }
+
+    function formatAIResponse(response, type) {
+        // Format workout plans
+        if (type === 'workout' && (response.includes('Day') || response.includes('Exercise'))) {
+            return formatWorkoutPlan(response);
+        }
+        
+        // Format diet plans
+        if (type === 'diet' && (response.includes('Meal') || response.includes('Breakfast'))) {
+            return formatDietPlan(response);
+        }
+        
+        // Default formatting
+        return response.replace(/\n/g, '<br>');
+    }
+
+    function formatWorkoutPlan(planText) {
+        // Basic formatting for workout plans
+        const formattedPlan = planText
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>')
+            .replace(/Day (\d+):/g, '<div class="plan-day"><div class="plan-day-title">Day $1</div>')
+            .replace(/- (.*?)(<br>|$)/g, '<li>$1</li>');
+        
+        return `
+            <div class="plan-container workout-plan">
+                ${formattedPlan}
+            </div>
+            <div class="plan-actions">
+                <button class="btn btn-primary save-plan">
+                    <i class="far fa-calendar-plus"></i> Save Workout
+                </button>
+                <button class="btn btn-outline share-plan">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
+        `;
+    }
+
+    function formatDietPlan(planText) {
+        // Basic formatting for diet plans
+        const formattedPlan = planText
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>')
+            .replace(/(Breakfast|Lunch|Dinner|Snack):/g, '<div class="meal-item"><div class="meal-time">$1</div><div class="meal-content">')
+            .replace(/(Calories|Protein|Carbs|Fat): (\d+g?)/g, '<span class="nutrition-fact"><strong>$1:</strong> $2</span>');
+        
+        return `
+            <div class="plan-container meal-plan">
+                ${formattedPlan}
+            </div>
+            <div class="plan-actions">
+                <button class="btn btn-primary save-plan">
+                    <i class="far fa-calendar-plus"></i> Save Meal Plan
+                </button>
+                <button class="btn btn-outline share-plan">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
+        `;
+    }
+
+    // Handle save and share buttons dynamically
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('save-plan') || e.target.closest('.save-plan')) {
+            const planText = e.target.closest('.message-content').textContent;
+            addToCalendar({
+                title: currentTab === 'workout' ? 'AI Workout Plan' : 'AI Diet Plan',
+                description: planText.replace(/<[^>]*>/g, ''),
+                start: new Date(),
+                end: new Date(Date.now() + 3600000)
+            });
+            showPopup('Plan saved to your calendar!', 'success');
+        }
+        
+        if (e.target.classList.contains('share-plan') || e.target.closest('.share-plan')) {
+            const planText = e.target.closest('.message-content').textContent;
+            sharePlan(planText.replace(/<[^>]*>/g, ''));
+        }
+    });
+
+    function addToCalendar(event) {
+        // This is a basic implementation - you might want to use a proper calendar API
+        console.log('Adding to calendar:', event);
+        // In a real app, you would integrate with Google Calendar or similar
+    }
+
+    function sharePlan(planText) {
+        if (navigator.share) {
+            navigator.share({
+                title: 'My Fitness Plan',
+                text: planText,
+                url: window.location.href
+            }).catch(err => {
+                console.log('Error sharing:', err);
+                showPopup('Sharing failed. Please try again.', 'error');
+            });
+        } else {
+            // Fallback for browsers that don't support Web Share API
+            const textArea = document.createElement('textarea');
+            textArea.value = planText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showPopup('Plan copied to clipboard!', 'success');
+        }
+    }
+}
+
+// AI response generation using Gemini
+async function generateAIResponse(prompt, type) {
+    try {
+        const API_KEY = "AIzaSyCGYLk04ZAIWfM7xgxbIArK6n2aRvl7Gyk"; // Replace with your actual API key
+        
+        // Create different prompts based on the type (workout or diet)
+        let systemPrompt;
+        if (type === 'workout') {
+            systemPrompt = `You are an expert fitness trainer. The user asked: "${prompt}". 
+            Provide a detailed, professional workout plan with exercises, sets, reps, and rest periods.
+            Structure it clearly with days if it's a multi-day plan.
+            Include warm-up and cool-down recommendations when appropriate.
+            Use simple language and be encouraging.`;
+        } else {
+            systemPrompt = `You are an expert nutritionist. The user asked: "${prompt}". 
+            Provide a detailed, professional meal plan with breakfast, lunch, dinner, and snacks.
+            Include portion sizes and nutritional information (calories, protein, carbs, fat).
+            Consider dietary restrictions if mentioned.
+            Use simple language and be encouraging.`;
+        }
+        
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: systemPrompt
+                    }]
+                }]
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            return data.candidates[0].content.parts[0].text;
+        } else {
+            console.error("Unexpected Gemini API response:", data);
+            return "I couldn't generate a response right now. Please try asking again or rephrase your question.";
+        }
+    } catch (error) {
+        console.error("AI Error:", error);
+        return "I'm having trouble connecting to the AI service. Please try again later.";
+    }
+}
+
 // Testimonials Slider
 function initTestimonialsSlider() {
     const testimonials = document.querySelectorAll('.testimonial-card');
@@ -336,6 +630,7 @@ function initApp() {
     initTestimonialsSlider();
     handleContactForm();
     initWhatsAppBooking();
+    initAIChat();
     
     // Add floating labels functionality
     const formInputs = document.querySelectorAll('.form-control');
