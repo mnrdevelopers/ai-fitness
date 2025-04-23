@@ -1519,3 +1519,15 @@ body {
         font-size: 0.9rem;
     }
 }
+
+@media (min-width: 769px) {
+    .desktop-text {
+        display: inline;
+    }
+}
+
+@media (max-width: 768px) {
+    .desktop-text {
+        display: none;
+    }
+}
