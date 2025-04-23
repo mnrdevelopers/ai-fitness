@@ -270,14 +270,6 @@ function initAIChat() {
             Email: mnrdeveloper11@gmail.com
             WhatsApp: +91 74160 06394
         `;
-        
-        // Remove typing indicator and show actual response
-        const botMessageElement = document.querySelector('.ai-bot-message:last-child');
-        if (botMessageElement) {
-            botMessageElement.innerHTML = `
-                <div class="message-content">${creatorResponse}</div>
-            `;
-        }
       
       // Add to chat history
         chatHistory.push({ role: 'user', content: message });
