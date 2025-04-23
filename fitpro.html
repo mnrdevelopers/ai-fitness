@@ -471,6 +471,38 @@
         </div>
     </footer>
 
+    <!-- AI Chat Modal -->
+<div id="aiChatModal" class="ai-chat-modal">
+    <div class="ai-chat-container">
+        <div class="ai-chat-header">
+            <div class="ai-chat-tabs">
+                <button class="ai-tab active" data-tab="workout">Workout</button>
+                <button class="ai-tab" data-tab="diet">Diet</button>
+            </div>
+            <button id="closeChat" class="ai-chat-close">&times;</button>
+        </div>
+        <div id="aiChatMessages" class="ai-chat-messages">
+            <div class="ai-message ai-bot-message">
+                <div class="message-content">
+                    Hi there! I'm your AI fitness and nutrition assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        <div class="ai-chat-input">
+            <div class="quick-questions">
+                <button class="quick-question" data-question="Create a workout plan for weight loss">Weight Loss Workout</button>
+                <button class="quick-question" data-question="Suggest a muscle gain diet plan">Muscle Gain Diet</button>
+                <button class="quick-question" data-question="Help with endurance training">Endurance Training</button>
+                <button class="quick-question" data-question="Create a vegetarian meal plan">Vegetarian Plan</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="aiChatInput" placeholder="Ask me anything about fitness or nutrition...">
+                <button id="sendChatMessage"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging-compat.js"></script>
