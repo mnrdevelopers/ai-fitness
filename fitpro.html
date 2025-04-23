@@ -58,7 +58,12 @@
         <li class="nav-item"><a href="#services" class="nav-link">Services</a></li>
         <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
         <li class="nav-item"><a href="#testimonials" class="nav-link">Success Stories</a></li>
-        <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li> 
+        <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+        <li class="nav-item ai-chat-item">
+        <button id="aiChatButton" class="nav-auth-btn">
+            <i class="fas fa-robot"></i> AI Trainer
+        </button>
+        </li>
         <li class="nav-item auth-item">
             <button id="signInButton" class="nav-auth-btn">
                 <i class="fab fa-google"></i> Sign In
@@ -466,124 +471,37 @@
         </div>
     </footer>
 
-    <div id="aiPlannerPopup" class="chat-popup">
-        <div class="chat-header">
-            <div class="trainer-header">
-                <img src="icon.png" alt="FitGenius Avatar" class="trainer-avatar">
-                <div class="trainer-info">
-                    <span>FitGenius AI Trainer</span>
-                    <small>Your personal fitness assistant</small>
-                </div>
+    <!-- AI Chat Modal -->
+<div id="aiChatModal" class="ai-chat-modal">
+    <div class="ai-chat-container">
+        <div class="ai-chat-header">
+            <div class="ai-chat-tabs">
+                <button class="ai-tab active" data-tab="workout">Workout</button>
+                <button class="ai-tab" data-tab="diet">Diet</button>
             </div>
-            <span id="closeChat" class="chat-close">&times;</span>
+            <button id="closeChat" class="ai-chat-close">&times;</button>
         </div>
-        <div class="chat-body">
-            <div class="welcome-message">
-                <p>Hi there! I'm FitGenius 👋</p>
-                <p>Let's create a personalized workout plan tailored just for you!</p>
-            </div>
-            
-            <div class="form-section">
-                <h4>Your Fitness Profile</h4>
-                <div class="form-group">
-                    <label>Primary Goal:
-                        <select id="goal" class="modern-select">
-                            <option value="" disabled selected>Select your goal</option>
-                            <option value="weight loss">Weight Loss</option>
-                            <option value="muscle gain">Muscle Gain</option>
-                            <option value="endurance">Endurance</option>
-                            <option value="flexibility">Flexibility</option>
-                            <option value="general fitness">General Fitness</option>
-                            <option value="rehabilitation">Rehabilitation</option>
-                        </select>
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>Fitness Level:
-                        <select id="level" class="modern-select">
-                            <option value="" disabled selected>Select your level</option>
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                        </select>
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>Focus Area:
-                        <select id="focusArea" class="modern-select">
-                            <option value="full body">Full Body</option>
-                            <option value="upper body">Upper Body</option>
-                            <option value="lower body">Lower Body</option>
-                            <option value="core">Core</option>
-                            <option value="cardio">Cardio</option>
-                            <option value="balance">Balance & Mobility</option>
-                        </select>
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>Available Equipment:
-                        <select id="equipment" class="modern-select">
-                            <option value="bodyweight only">Bodyweight Only</option>
-                            <option value="dumbbells" selected>Dumbbells</option>
-                            <option value="resistance bands">Resistance Bands</option>
-                            <option value="kettlebells">Kettlebells</option>
-                            <option value="gym equipment">Full Gym Equipment</option>
-                        </select>
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>Workout Duration (minutes):
-                        <input type="number" id="duration" min="15" max="120" value="45" class="modern-input">
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>Days per Week:
-                        <input type="number" id="daysPerWeek" min="1" max="7" value="3" class="modern-input">
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>Any injuries or limitations?
-                        <input type="text" id="injuries" placeholder="E.g. bad knee, back pain" class="modern-input">
-                    </label>
-                </div>
-            </div>
-            
-            <button id="generatePlan" class="btn btn-primary generate-btn">
-                <span id="generateText">Generate Personalized Plan</span>
-                <span id="generateSpinner" style="display:none;">
-                    <i class="fas fa-spinner fa-spin"></i> FitGenius is working...
-                </span>
-            </button>
-            
-            <div id="aiPlanResult" class="plan-result"></div>
-            
-            <div class="suggestions">
-                <h5>Quick Suggestions</h5>
-                <div class="suggestion-buttons">
-                    <button class="suggestion-btn" data-goal="weight loss" data-level="beginner">Beginner Weight Loss</button>
-                    <button class="suggestion-btn" data-goal="muscle gain" data-level="intermediate">Intermediate Muscle Gain</button>
-                    <button class="suggestion-btn" data-goal="endurance" data-level="advanced">Advanced Endurance</button>
+        <div id="aiChatMessages" class="ai-chat-messages">
+            <div class="ai-message ai-bot-message">
+                <div class="message-content">
+                    Hi there! I'm your AI fitness and nutrition assistant. How can I help you today?
                 </div>
             </div>
         </div>
-        
-        <div class="chat-footer">
-            <small>FitGenius v2.0 - AI-powered fitness assistant</small>
+        <div class="ai-chat-input">
+            <div class="quick-questions">
+                <button class="quick-question" data-question="Create a workout plan for weight loss">Weight Loss Workout</button>
+                <button class="quick-question" data-question="Suggest a muscle gain diet plan">Muscle Gain Diet</button>
+                <button class="quick-question" data-question="Help with endurance training">Endurance Training</button>
+                <button class="quick-question" data-question="Create a vegetarian meal plan">Vegetarian Plan</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="aiChatInput" placeholder="Ask me anything about fitness or nutrition...">
+                <button id="sendChatMessage"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
     </div>
-
-    <button id="fabAiPlanner" class="fab-chat" title="Get AI Workout Plan">
-        <i class="fas fa-dumbbell"></i>
-      </button>
-      
-      
-      
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
