@@ -60,9 +60,9 @@
         <li class="nav-item"><a href="#testimonials" class="nav-link">Success Stories</a></li>
         <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
         <li class="nav-item ai-chat-item">
-    <button id="aiChatButton" class="nav-auth-btn">
+    <button id="aiChatButton" class="nav-auth-btn ai-trainer-btn">
         <i class="fas fa-robot"></i>
-        <span class="desktop-text">AI Trainer</span>
+        <span class="desktop-text">FitBot AI</span>
     </button>
 </li>
         <li class="nav-item auth-item">
@@ -475,14 +475,28 @@
     <!-- AI Chat Modal -->
 <div id="aiChatModal" class="ai-chat-modal">
     <div class="ai-chat-container">
-        <div class="ai-chat-title">FitBot AI Trainer</div>
         <div class="ai-chat-header">
-            <div class="ai-chat-tabs">
-                <button class="ai-tab active" data-tab="workout">Workout</button>
-                <button class="ai-tab" data-tab="diet">Diet</button>
+            <div class="ai-chat-brand">
+                <div class="ai-logo">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="ai-title">
+                    <h3>FitBot AI Trainer</h3>
+                    <p>Your virtual fitness assistant</p>
+                </div>
             </div>
             <button id="closeChat" class="ai-chat-close">&times;</button>
         </div>
+        
+        <div class="ai-chat-tabs">
+            <button class="ai-tab active" data-tab="workout">
+                <i class="fas fa-dumbbell"></i> Workout
+            </button>
+            <button class="ai-tab" data-tab="diet">
+                <i class="fas fa-utensils"></i> Diet
+            </button>
+        </div>
+        
         <div id="aiChatMessages" class="ai-chat-messages">
             <div class="ai-message ai-bot-message">
                 <div class="message-content">
