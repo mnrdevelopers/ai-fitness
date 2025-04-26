@@ -60,9 +60,9 @@
         <li class="nav-item"><a href="#testimonials" class="nav-link">Success Stories</a></li>
         <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
         <li class="nav-item ai-chat-item">
-    <button id="aiChatButton" class="nav-auth-btn">
+    <button id="aiChatButton" class="nav-auth-btn ai-trainer-btn">
         <i class="fas fa-robot"></i>
-        <span class="desktop-text">AI Trainer</span>
+        <span class="desktop-text">FitBot AI</span>
     </button>
 </li>
         <li class="nav-item auth-item">
@@ -475,36 +475,61 @@
     <!-- AI Chat Modal -->
 <div id="aiChatModal" class="ai-chat-modal">
     <div class="ai-chat-container">
-        <div class="ai-chat-title">FitBot AI Trainer</div>
         <div class="ai-chat-header">
-            <div class="ai-chat-tabs">
-                <button class="ai-tab active" data-tab="workout">Workout</button>
-                <button class="ai-tab" data-tab="diet">Diet</button>
+            <div class="ai-chat-brand">
+                <div class="ai-logo">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="ai-title">
+                    <h3>FitBot AI Trainer</h3>
+                    <p>Your virtual fitness assistant</p>
+                </div>
             </div>
             <button id="closeChat" class="ai-chat-close">&times;</button>
         </div>
+        
+        <div class="ai-chat-tabs">
+            <button class="ai-tab active" data-tab="workout">
+                <i class="fas fa-dumbbell"></i> Workout
+            </button>
+            <button class="ai-tab" data-tab="diet">
+                <i class="fas fa-utensils"></i> Diet
+            </button>
+        </div>
+        
         <div id="aiChatMessages" class="ai-chat-messages">
             <div class="ai-message ai-bot-message">
                 <div class="message-content">
-                    Hi there! I'm your AI fitness and nutrition assistant. How can I help you today?
+                    Hi there! I'm FitBot, your AI fitness and nutrition assistant. How can I help you today?
                 </div>
             </div>
         </div>
-        <div class="ai-chat-input">
+        
+        <div class="ai-chat-input-area">
             <div class="quick-questions">
-                <button class="quick-question" data-question="Create a workout plan for weight loss">Weight Loss Workout</button>
-                <button class="quick-question" data-question="Suggest a muscle gain diet plan">Muscle Gain Diet</button>
-                <button class="quick-question" data-question="Help with endurance training">Endurance Training</button>
-                <button class="quick-question" data-question="Create a vegetarian meal plan">Vegetarian Plan</button>
+                <button class="quick-question" data-question="Create a workout plan for weight loss">
+                    <i class="fas fa-fire"></i> Weight Loss
+                </button>
+                <button class="quick-question" data-question="Suggest a muscle gain diet plan">
+                    <i class="fas fa-dumbbell"></i> Muscle Gain
+                </button>
+                <button class="quick-question" data-question="Help with endurance training">
+                    <i class="fas fa-running"></i> Endurance
+                </button>
             </div>
             <div class="input-group">
-                <input type="text" id="aiChatInput" placeholder="Ask me anything about fitness or nutrition...">
+                <input type="text" id="aiChatInput" placeholder="Ask FitBot anything about fitness or nutrition...">
                 <button id="sendChatMessage"><i class="fas fa-paper-plane"></i></button>
             </div>
-            <div class="ai-chat-footer">
-    <p>Powered by <strong>FitBot AI</strong> | Your virtual trainer</p>
-</div>
         </div>
+        
+      <div class="ai-chat-footer" style="text-align:center; font-size: 0.9rem; color: #777; padding: 1rem 0; border-top: 1px solid #eee;">
+  <p>
+    🤖 Powered by <strong style="color: #4CAF50;">FITBOT AI v2.0</strong>
+    <span style="margin: 0 6px;">|</span>
+    <em>Responses are AI-generated and may vary</em>
+  </p>
+</div>
     </div>
 </div>
 
