@@ -167,6 +167,94 @@ body {
 }
 
 /* AI Chat Styles */
+.ai-trainer-btn {
+    background: linear-gradient(135deg, #F5C45E 0%, #FF9A5A 100%);
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(245, 196, 94, 0.4);
+}
+
+.ai-trainer-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(245, 196, 94, 0.6);
+}
+
+.ai-chat-modal {
+    background: linear-gradient(145deg, #ffffff 0%, #f9f9f9 100%);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+}
+
+.ai-chat-header {
+    background: linear-gradient(135deg, #F5C45E 0%, #FF9A5A 100%);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #000;
+}
+
+.ai-chat-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-logo {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.ai-title h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.ai-title p {
+    font-size: 0.7rem;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.ai-chat-tabs {
+    display: flex;
+    background: rgba(245, 196, 94, 0.1);
+    padding: 5px;
+    margin: 0 15px;
+    border-radius: 50px;
+}
+
+.ai-tab {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 50px;
+    border: none;
+    background: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.ai-tab.active {
+    background: #F5C45E;
+    color: #000;
+}
+
 .ai-chat-title {
     font-weight: 600;
     font-size: 1rem;
